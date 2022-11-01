@@ -27,7 +27,13 @@ export default function SubcriptionPlan() {
                         features={["Feature 1", "Feature 2"]}
                     />
 
-                    <SubcriptionCard isPremium />
+                    <SubcriptionCard
+                        isPremium
+                        name="Premium"
+                        price={220000}
+                        durationInMount={6}
+                        features={["Feature 1", "Feature 2","Feature 3 "]}
+                    />
                 </div>
                 {/* <!-- /Pricing Card --> */}
             </div>
