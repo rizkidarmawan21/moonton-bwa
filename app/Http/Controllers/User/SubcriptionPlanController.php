@@ -1,9 +1,13 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\User;
 
+use App\Http\Controllers\Controller;
 use App\Models\SubcriptionPlan;
+use App\Models\UserSubcription;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class SubcriptionPlanController extends Controller
 {
@@ -14,8 +18,13 @@ class SubcriptionPlanController extends Controller
      */
     public function index()
     {
-        //
+        
+        $subcriptionPlans = SubcriptionPlan::all();
+        return inertia('User/SubcriptionPlan/Index',compact('subcriptionPlans'));
+
+        // dd($subcriptionPlans);
     }
+    
 
     /**
      * Show the form for creating a new resource.
@@ -33,9 +42,20 @@ class SubcriptionPlanController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(Request $request, SubcriptionPlan $subcriptionPlan)
     {
-        //
+        $data = [
+            'user_id' => Auth::user()->id,
+            'subcription_plan_id' => $subcriptionPlan->id,
+            'price' => $subcriptionPlan->price,
+            'expired_date' => Carbon::now()->addMonths($subcriptionPlan->active_period_in_months),
+            'payment_status' => 'paid'  
+        ];
+
+        UserSubcription::create($data);
+
+        return redirect()->route('user.dashboard.index');
+
     }
 
     /**
