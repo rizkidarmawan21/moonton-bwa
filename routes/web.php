@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\MovieController as AdminMovieController;
 use App\Http\Controllers\User\DashboardController;
 use App\Http\Controllers\User\MovieController;
 use App\Http\Controllers\User\SubcriptionPlanController;
@@ -18,9 +19,9 @@ use Inertia\Inertia;
 |
 */
 
-// Route::get('admin', function () {
-//     return ' Hi Admin';
-// })->middleware('role:admin');
+Route::get('admin', function () {
+    return ' Hi Admin';
+})->middleware('role:admin');
 
 // Route::get('user', function () {
 //     return ' Hi user';
@@ -44,6 +45,9 @@ Route::middleware(['auth', 'role:user'])->prefix('dashboard')->name('user.dashbo
     Route::post('subcription-plan/{subcriptionPlan}/user-subcribe', [SubcriptionPlanController::class, 'store'])->name('subcriptionPlan.store')->middleware('checkUserSubcription:false');
 });
 
+Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.dashboard.')->group(function () {
+    Route::resource('movie',AdminMovieController::class);
+});
 
 Route::prefix('prototype')->name('prototype.')->group(function () {
     route::get('/login', function () {
