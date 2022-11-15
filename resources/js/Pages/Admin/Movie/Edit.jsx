@@ -8,10 +8,12 @@ import { Inertia } from "@inertiajs/inertia";
 import { Head, useForm } from "@inertiajs/inertia-react";
 import React from "react";
 
-export default function Create({ auth,movie }) {
-    const { data,setData, processing, errors } = useForm({
+export default function Create({ auth, movie }) {
+    const { data, setData, processing, errors } = useForm({
         ...movie,
     });
+
+    console.log(data);
 
     const onHandleChange = (event) => {
         setData(
@@ -25,12 +27,13 @@ export default function Create({ auth,movie }) {
     const submit = (e) => {
         e.preventDefault();
 
-        if(data.thumbnail === movie.thumbnail){
-            delete data.thumbnail
+        if (data.thumbnail === movie.thumbnail) {
+            delete data.thumbnail;
+            // console.log("gambar sma");
         }
 
-        Inertia.put(route("admin.dashboard.movie.update",movie.id),{
-            _method:'PUT',
+        Inertia.post(route("admin.dashboard.movie.update", movie.id), {
+            _method: "PUT",
             ...data,
         });
     };
@@ -83,7 +86,12 @@ export default function Create({ auth,movie }) {
                     />
                     <InputError message={errors.video_url} className="mt-2" />
                 </div>
-                <img className="mt-3" src={`/storage/${movie.thumbnail}`} width="250" alt="" />
+                <img
+                    className="mt-3"
+                    src={`/storage/${movie.thumbnail}`}
+                    width="250"
+                    alt=""
+                />
                 <div className="mt-4">
                     <InputLabel forInput="thumbnail" value="Thumbnail" />
                     <TextInput
@@ -92,7 +100,6 @@ export default function Create({ auth,movie }) {
                         placeholder="Insert the thumbnail of the movie"
                         variant="primary-outline"
                         isFocused={true}
-                    
                         isError={errors.thumbnail}
                         handleChange={onHandleChange}
                     />
@@ -117,7 +124,6 @@ export default function Create({ auth,movie }) {
                         forInput="is_featured"
                         value="Is Featured"
                         className="mr-3 mt-1"
-                        
                     />
                     <Checkbox
                         name="is_featured"

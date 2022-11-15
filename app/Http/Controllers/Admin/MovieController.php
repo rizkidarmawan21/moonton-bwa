@@ -19,8 +19,8 @@ class MovieController extends Controller
      */
     public function index()
     {
-        $movies = Movie::all();
-        return inertia('Admin/Movie/Index',compact('movies'));
+        $movies = Movie::withTrashed()->orderBy('deleted_at')->get();
+        return inertia('Admin/Movie/Index', compact('movies'));
     }
 
     /**
@@ -30,7 +30,7 @@ class MovieController extends Controller
      */
     public function create()
     {
-       return inertia('Admin/Movie/Create');
+        return inertia('Admin/Movie/Create');
     }
 
     /**
@@ -43,7 +43,7 @@ class MovieController extends Controller
     {
         $data = $request->all();
 
-        $data['thumbnail'] = Storage::disk('public')->put('movies',$request->file('thumbnail'));
+        $data['thumbnail'] = Storage::disk('public')->put('movies', $request->file('thumbnail'));
         $data['slug'] = Str::slug($data['name']);
 
         Movie::create($data);
@@ -62,7 +62,6 @@ class MovieController extends Controller
      */
     public function show(Movie $movie)
     {
-        
     }
 
     /**
@@ -73,7 +72,7 @@ class MovieController extends Controller
      */
     public function edit(Movie $movie)
     {
-        return inertia('Admin/Movie/Edit',compact('movie'));
+        return inertia('Admin/Movie/Edit', compact('movie'));
     }
 
     /**
@@ -86,6 +85,8 @@ class MovieController extends Controller
     public function update(Update $request, Movie $movie)
     {
         $data = $request->validated();
+
+        
         if($request->file('thumbnail')){
             $data['thumbnail'] = Storage::disk('public')->put('movies',$request->file('thumbnail'));
             Storage::disk('public')->delete($movie->thumbnail);
@@ -110,6 +111,21 @@ class MovieController extends Controller
      */
     public function destroy(Movie $movie)
     {
-        //
+        // Storage::disk('public')->delete($movie->thumbnail);
+        $movie->delete();
+
+        return redirect(route('admin.dashboard.movie.index'))->with([
+            'message' => 'Movie deleted successfully',
+            'type'    => 'success'
+        ]);
+    }
+
+    public function restore($movie)
+    {
+        Movie::withTrashed()->find($movie)->restore();
+        return redirect(route('admin.dashboard.movie.index'))->with([
+            'message' => 'Movie restored successfully',
+            'type'    => 'success'
+        ]);
     }
 }
