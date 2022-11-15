@@ -36,6 +36,8 @@ Route::get('admin', function () {
 //     ]);
 // });
 
+Route::post('midtrans/notification', [SubcriptionPlanController::class, 'midtransCallback']);
+
 Route::redirect('/', 'login');
 
 Route::middleware(['auth', 'role:user'])->prefix('dashboard')->name('user.dashboard.')->group(function () {

@@ -5,18 +5,46 @@ import { Head } from "@inertiajs/inertia-react";
 import React from "react";
 
 export default function SubcriptionPlan(props) {
-    const selectSubcription = id => {
-        Inertia.post(route('user.dashboard.subcriptionPlan.store',{
-            subcriptionPlan: id
-        }))
-    }
+    const selectSubcription = (id) => {
+        Inertia.post(
+            route("user.dashboard.subcriptionPlan.store", {
+                subcriptionPlan: id,
+            }),
+            {},
+            {
+                only: ["userSubcription"],
+                onSuccess: ({ props }) => {
+                    onSnapMidtrans(props.userSubcription);
+                },
+            }
+        );
+    };
 
-
+    const onSnapMidtrans = (userSubcription) => {
+        snap.pay(userSubcription.snap_token, {
+            onSuccess: function (result) {
+                console.log(result);
+                Inertia.visit(route('user.dashboard.index'))
+            },
+            // Optional
+            onPending: function (result) {
+                console.log(result);
+            },
+            // Optional
+            onError: function (result) {
+                console.log(result);
+            },
+        });
+    };
 
     return (
         <Authenticated auth={props.auth}>
             <Head>
                 <title>Subcription</title>
+                <script
+                    src="https://app.sandbox.midtrans.com/snap/snap.js"
+                    data-client-key={props.env.MIDTRANS_CLIENTKEY}
+                ></script>
             </Head>
             <div className="py-20 flex flex-col items-center">
                 <div className="text-black font-semibold text-[26px] mb-3">
@@ -31,17 +59,19 @@ export default function SubcriptionPlan(props) {
                 <div className="flex justify-center gap-10 mt-[70px]">
                     {props.subcriptionPlans.map((subcription) => (
                         <SubcriptionCard
-                        key={subcription.id}
-                        name={subcription.name}
-                        price={subcription.price}
-                        durationInMount={subcription.active_period_in_months}
-                        features={JSON.parse(subcription.features)}
-                        isPremium={subcription.name === 'Premium'}
-                        onSelectSubcription={() => selectSubcription(subcription.id)}
+                            key={subcription.id}
+                            name={subcription.name}
+                            price={subcription.price}
+                            durationInMount={
+                                subcription.active_period_in_months
+                            }
+                            features={JSON.parse(subcription.features)}
+                            isPremium={subcription.name === "Premium"}
+                            onSelectSubcription={() =>
+                                selectSubcription(subcription.id)
+                            }
                         />
-                    ))
-                    
-                    }
+                    ))}
                 </div>
                 {/* <!-- /Pricing Card --> */}
             </div>
